@@ -7,22 +7,33 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.XRPArm;
 
 public class XRPTest extends CommandBase {
   private final Drivetrain m_drivetrain;
+  private final XRPArm m_arm;
+  
   private double m_currSpeed = 0.0;
   private double m_delta = 0.2;
   private double m_lastRampUpdateTime = 0;
   private double m_lastStateTime = 0;
   private boolean m_isRamp;
 
+  private double m_currAngle = 0.0;
+  private double m_angleDelta = 5.0;
+  private double m_lastAngleChangeTime = 0;
+
+  private final double ANGLE_CHANGE_STEP_TIME = 0.2;
+
   private final double RAMP_TIME = 3.0;
   private final double PAUSE_TIME = 2.0;
 
   /** Creates a new XRPTest. */
-  public XRPTest(Drivetrain drivetrain) {
+  public XRPTest(Drivetrain drivetrain, XRPArm arm) {
     m_drivetrain = drivetrain;
+    m_arm = arm;
     addRequirements(drivetrain);
+    addRequirements(arm);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -34,6 +45,7 @@ public class XRPTest extends CommandBase {
     m_isRamp = true;
     m_currSpeed = 0;
     m_drivetrain.arcadeDrive(m_currSpeed, 0);
+    m_arm.setAngle(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -41,6 +53,7 @@ public class XRPTest extends CommandBase {
   public void execute() {
     double currTime = Timer.getFPGATimestamp();
 
+    // Drivetrain Test
     if (m_isRamp) {
       // Check if we should check out of ramp mode
       if (currTime - m_lastStateTime > RAMP_TIME) {
@@ -71,6 +84,21 @@ public class XRPTest extends CommandBase {
         m_lastStateTime = currTime;
         m_isRamp = true;
       }
+    }
+
+    // Servo Test
+    if (currTime - m_lastAngleChangeTime > ANGLE_CHANGE_STEP_TIME) {
+      m_currAngle += m_angleDelta;
+      if (m_currAngle > 180.0) {
+        m_currAngle = 180.0;
+        m_angleDelta = -m_angleDelta;
+      }
+      if (m_currAngle < 0.0) {
+        m_currAngle = 0.0;
+        m_angleDelta = -m_angleDelta;
+      }
+      m_arm.setAngle(m_currAngle);
+      m_lastAngleChangeTime = currTime;
     }
 
     // if (Timer.getFPGATimestamp() - m_lastRampUpdateTime > 0.1) {
