@@ -4,16 +4,16 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.xrp.XRPServo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class XRPArm extends SubsystemBase {
-  private Servo armServo;
+  private XRPServo armServo;
 
   /** Creates a new XRPArm. */
   public XRPArm() {
     // Maps to XRP Servo 1
-    armServo = new Servo(4);
+    armServo = new XRPServo(4);
   }
 
   @Override

@@ -3,10 +3,17 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2023.4.2"
 }
 
+// Remote Dev builds
 wpi.maven.useLocal = false
 wpi.maven.useDevelopment = true
 wpi.versions.wpilibVersion = '2023.+'
 wpi.versions.wpimathVersion = '2023.+'
+
+// Local Dev Builds
+// wpi.maven.useLocal = false
+// wpi.maven.useFrcMavenLocalDevelopment = true
+// wpi.versions.wpilibVersion = '2023.424242.+'
+// wpi.versions.wpimathVersion = '2023.424242.+'
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
@@ -46,7 +53,8 @@ wpi.sim.addDriverstation()
 
 //Sets the websocket client remote host.
 wpi.sim.envVar("HALSIMWS_HOST", "192.168.42.1")
-wpi.sim.envVar("HALSIMWS_FILTERS", "Gyro,Encoder,DriverStation,PWM,DIO,AIO")
+// wpi.sim.envVar("HALSIMWS_HOST", "127.0.0.1")
+wpi.sim.envVar("HALSIMWS_FILTERS", "Gyro,Encoder,DriverStation,DIO,AIO,XRPMotor,XRPServo")
 wpi.sim.addWebsocketsServer().defaultEnabled = true
 wpi.sim.addWebsocketsClient().defaultEnabled = true
 
