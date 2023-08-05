@@ -4,34 +4,28 @@
 
 package frc.robot.subsystems;
 
+import java.lang.Math;
+
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.sensors.RomiGyro;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.xrp.XRPMotor;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public class Drivetrain extends Subsystem {
-  private static final double kCountsPerRevolution = 1440.0;
-  private static final double kWheelDiameterInch = 2.75591; // 70 mm
-
-  // The Romi has the left and right motors set to
-  // PWM channels 0 and 1 respectively
-  // private final Spark m_leftMotor = new Spark(0);
-  // private final Spark m_rightMotor = new Spark(1);
+  private static final double kCountsPerRevolution = 144.0;
+  private static final double kWheelDiameterInch = 2.25; // 70 mm
 
   private final XRPMotor m_leftXrpMotor = new XRPMotor(0);
   private final XRPMotor m_rightXrpMotor = new XRPMotor(1);
 
-  // The Romi has onboard encoders that are hardcoded
+  // The XRP has onboard encoders that are hardcoded
   // to use DIO pins 4/5 and 6/7 for the left and right
   private final Encoder m_leftEncoder = new Encoder(4, 5);
   private final Encoder m_rightEncoder = new Encoder(6, 7);
 
   // Set up the differential drive controller
-  // private final DifferentialDrive m_diffDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
-  // private final DifferentialDrive m_diffDrivePwm = new DifferentialDrive(m_leftMotor, m_rightMotor);
   private final DifferentialDrive m_diffDrive = new DifferentialDrive(m_leftXrpMotor, m_rightXrpMotor);
 
   // Set up the RomiGyro
@@ -81,7 +75,10 @@ public class Drivetrain extends Subsystem {
   }
 
   public double getAverageDistanceInch() {
-    return (getLeftDistanceInch() + getRightDistanceInch()) / 2.0;
+    double leftDistance = Math.abs(getLeftDistanceInch());
+    double rightDistance = Math.abs(getRightDistanceInch());
+    //System.out.println( "Left Encoder Distance: " + leftDistance + ", Right Encoder: " + rightDistance);
+    return (leftDistance + rightDistance) /2.0;
   }
 
   /**
