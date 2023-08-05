@@ -31,24 +31,26 @@
           "open": true
         }
       }
-    },
-    "PWM Outputs": {
-      "window": {
-        "visible": true
-      }
     }
   },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/SendableChooser[0]": "String Chooser"
+    },
+    "windows": {
+      "/SmartDashboard/SendableChooser[0]": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "Plot": {
     "Plot <0>": {
       "plots": [
         {
-          "height": 338,
+          "height": 158,
           "series": [
             {
               "color": [
