@@ -8,8 +8,10 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.ArcadeDrive;
+import frc.robot.commands.ArmControl;
 import frc.robot.commands.AutonomousDistance;
 import frc.robot.commands.AutonomousTime;
+import frc.robot.commands.ArmTest;
 import frc.robot.commands.XRPTest;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.XRPArm;
@@ -35,6 +37,7 @@ public class RobotContainer {
 
   // Assumes a gamepad plugged into channnel 0
   private final Joystick m_controller = new Joystick(0);
+  private final XboxController m_xcontroller = new XboxController(1);
 
   // Create SmartDashboard chooser for autonomous routines
   private final SendableChooser<Command> m_chooser = new SendableChooser<>();
@@ -63,9 +66,15 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    boolean useXboxController = true;
+
     // Default command is arcade drive. This will run unless another command
     // is scheduled over it.
-    m_drivetrain.setDefaultCommand(getArcadeDriveCommand());
+    m_drivetrain.setDefaultCommand(getArcadeDriveCommand(useXboxController));
+
+    // Default command for the arm controller. This command will run unless another
+    // command that requires the arm is scheduled over it
+    m_arm.setDefaultCommand(getArmControlCommand(useXboxController));
 
     // Example of how to use the onboard IO
     Trigger onboardButtonA = new Trigger(m_onboardIO::getUserButtonPressed);
@@ -75,6 +84,7 @@ public class RobotContainer {
 
     // Setup SmartDashboard options
     m_chooser.setDefaultOption("XRPTest", new XRPTest(m_drivetrain, m_arm));
+    m_chooser.addOption("ArmTest", new ArmTest(m_arm));
     m_chooser.addOption("Auto Routine Distance", new AutonomousDistance(m_drivetrain));
     m_chooser.addOption("Auto Routine Time", new AutonomousTime(m_drivetrain));
     SmartDashboard.putData(m_chooser);
@@ -94,8 +104,40 @@ public class RobotContainer {
    *
    * @return the command to run in teleop
    */
-  public Command getArcadeDriveCommand() {
-    return new ArcadeDrive(
-        m_drivetrain, () -> -m_controller.getRawAxis(1), () -> -m_controller.getRawAxis(2));
+  public Command getArcadeDriveCommand( boolean useXboxController ) {
+    Command driveCommand;
+
+    if ( useXboxController )
+        driveCommand = new ArcadeDrive(
+	    m_drivetrain,
+	    () -> -m_xcontroller.getRawAxis(XboxController.Axis.kLeftY.value),
+	    () -> -m_xcontroller.getRawAxis(XboxController.Axis.kRightX.value));
+    else
+        driveCommand = new ArcadeDrive(
+            m_drivetrain,
+	    () -> -m_controller.getRawAxis(1),
+	    () -> -m_controller.getRawAxis(2));
+    return driveCommand;
+  }
+
+  /**
+   * Use this function to create the arm control command in {@link Robot} class.
+   *
+   * @return the arm control command to run in teleop mode
+   */
+  public Command getArmControlCommand( boolean useXboxController ) {
+    Command armCommand;
+
+    if ( useXboxController )
+        armCommand = new ArmControl(
+	    m_arm,
+            () -> m_xcontroller.getRawButtonPressed(XboxController.Button.kLeftBumper.value),
+            () -> m_xcontroller.getRawButtonPressed(XboxController.Button.kRightBumper.value));
+    else
+        armCommand = new ArmControl(
+	    m_arm,
+            () -> m_controller.getRawButtonPressed(1),
+            () -> m_controller.getRawButtonPressed(2));
+    return armCommand;
   }
 }
