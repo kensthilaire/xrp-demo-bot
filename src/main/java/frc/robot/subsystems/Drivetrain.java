@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.xrp.XRPMotor;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public class Drivetrain extends Subsystem {
-  private static final double kCountsPerRevolution = 144.0;
+  private static final double kCountsPerRevolution = 585.0;
   private static final double kWheelDiameterInch = 2.25; // 70 mm
 
   private final XRPMotor m_leftXrpMotor = new XRPMotor(0);
