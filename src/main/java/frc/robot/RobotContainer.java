@@ -66,7 +66,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    boolean useXboxController = true;
+    boolean useXboxController = false;
 
     // Default command is arcade drive. This will run unless another command
     // is scheduled over it.
@@ -109,14 +109,14 @@ public class RobotContainer {
 
     if ( useXboxController )
         driveCommand = new ArcadeDrive(
-	    m_drivetrain,
-	    () -> -m_xcontroller.getRawAxis(XboxController.Axis.kLeftY.value),
-	    () -> -m_xcontroller.getRawAxis(XboxController.Axis.kRightX.value));
+	          m_drivetrain,
+	          () -> -m_xcontroller.getRawAxis(XboxController.Axis.kLeftY.value),
+	          () -> -m_xcontroller.getRawAxis(XboxController.Axis.kRightX.value));
     else
         driveCommand = new ArcadeDrive(
             m_drivetrain,
-	    () -> -m_controller.getRawAxis(1),
-	    () -> -m_controller.getRawAxis(2));
+	          () -> -m_controller.getRawAxis(1),
+	          () -> -m_controller.getRawAxis(2));
     return driveCommand;
   }
 
@@ -130,12 +130,12 @@ public class RobotContainer {
 
     if ( useXboxController )
         armCommand = new ArmControl(
-	    m_arm,
+	          m_arm,
             () -> m_xcontroller.getRawButtonPressed(XboxController.Button.kLeftBumper.value),
             () -> m_xcontroller.getRawButtonPressed(XboxController.Button.kRightBumper.value));
     else
         armCommand = new ArmControl(
-	    m_arm,
+	          m_arm,
             () -> m_controller.getRawButtonPressed(1),
             () -> m_controller.getRawButtonPressed(2));
     return armCommand;
