@@ -4,12 +4,12 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.XRPArm;
+import frc.robot.subsystems.Arm;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Supplier;
 
 public class ArmControl extends Command {
-  private final XRPArm m_arm;
+  private final Arm m_arm;
   private final Supplier<Boolean> m_extendSupplier;
   private final Supplier<Boolean> m_retractSupplier;
 
@@ -17,14 +17,14 @@ public class ArmControl extends Command {
 
   /**
    * Creates a new ArmControl command. This command will extend or retract the
-   * XRP arm based on controller input. This command does not terminate.
+   * XXRPRP arm based on controller input. This command does not terminate.
    *
    * @param arm - the XRP arm instance to control
    * @param extendSupplier - button supplier to extend the arm to the full open position
    * @param retractSupplier - button supplier to retract the arm to starting position
    */
   public ArmControl(
-      XRPArm arm,
+      Arm arm,
       Supplier<Boolean> extendSupplier,
       Supplier<Boolean> retractSupplier
   ) {

@@ -11,15 +11,15 @@ import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.ArmControl;
 import frc.robot.commands.AutonomousDistance;
 import frc.robot.commands.AutonomousTime;
-import frc.robot.commands.ArmTest;
-import frc.robot.commands.XRPTest;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.XRPArm;
-import frc.robot.subsystems.XRPOnBoardIO;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.xrp.XRPOnBoardIO;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -31,27 +31,15 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Drivetrain m_drivetrain = new Drivetrain();
-
   private final XRPOnBoardIO m_onboardIO = new XRPOnBoardIO();
-  private final XRPArm m_arm = new XRPArm();
+  private final Arm m_arm = new Arm();
 
-  // Assumes a gamepad plugged into channnel 0
+  // Assumes a gamepad plugged into channel 0
   private final Joystick m_controller = new Joystick(0);
   private final XboxController m_xcontroller = new XboxController(1);
 
   // Create SmartDashboard chooser for autonomous routines
   private final SendableChooser<Command> m_chooser = new SendableChooser<>();
-
-  // NOTE: The I/O pin functionality of the 5 exposed I/O pins depends on the hardware "overlay"
-  // that is specified when launching the wpilib-ws server on the Romi raspberry pi.
-  // By default, the following are available (listed in order from inside of the board to outside):
-  // - DIO 8 (mapped to Arduino pin 11, closest to the inside of the board)
-  // - Analog In 0 (mapped to Analog Channel 6 / Arduino Pin 4)
-  // - Analog In 1 (mapped to Analog Channel 2 / Arduino Pin 20)
-  // - PWM 2 (mapped to Arduino Pin 21)
-  // - PWM 3 (mapped to Arduino Pin 22)
-  //
-  // Your subsystem configuration should take the overlays into account
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -77,15 +65,23 @@ public class RobotContainer {
     m_arm.setDefaultCommand(getArmControlCommand(useXboxController));
 
     // Example of how to use the onboard IO
-    Trigger onboardButtonA = new Trigger(m_onboardIO::getUserButtonPressed);
-    onboardButtonA
+    Trigger userButton = new Trigger(m_onboardIO::getUserButtonPressed);
+    userButton
         .onTrue(new PrintCommand("USER Button Pressed"))
         .onFalse(new PrintCommand("USER Button Released"));
 
+    JoystickButton joystickAButton = new JoystickButton(m_controller, 1);
+    joystickAButton
+        .onTrue(new InstantCommand(() -> m_arm.setAngle(45.0), m_arm))
+        .onFalse(new InstantCommand(() -> m_arm.setAngle(0.0), m_arm));
+
+    JoystickButton joystickBButton = new JoystickButton(m_controller, 2);
+    joystickBButton
+        .onTrue(new InstantCommand(() -> m_arm.setAngle(90.0), m_arm))
+        .onFalse(new InstantCommand(() -> m_arm.setAngle(0.0), m_arm));
+
     // Setup SmartDashboard options
-    m_chooser.setDefaultOption("XRPTest", new XRPTest(m_drivetrain, m_arm));
-    m_chooser.addOption("ArmTest", new ArmTest(m_arm));
-    m_chooser.addOption("Auto Routine Distance", new AutonomousDistance(m_drivetrain));
+    m_chooser.setDefaultOption("Auto Routine Distance", new AutonomousDistance(m_drivetrain));
     m_chooser.addOption("Auto Routine Time", new AutonomousTime(m_drivetrain));
     SmartDashboard.putData(m_chooser);
   }
@@ -109,14 +105,14 @@ public class RobotContainer {
 
     if ( useXboxController )
         driveCommand = new ArcadeDrive(
-	    m_drivetrain,
-	    () -> -m_xcontroller.getRawAxis(XboxController.Axis.kLeftY.value),
-	    () -> -m_xcontroller.getRawAxis(XboxController.Axis.kRightX.value));
+              m_drivetrain,
+              () -> -m_xcontroller.getRawAxis(XboxController.Axis.kLeftY.value),
+              () -> -m_xcontroller.getRawAxis(XboxController.Axis.kRightX.value));
     else
         driveCommand = new ArcadeDrive(
             m_drivetrain,
-	    () -> -m_controller.getRawAxis(1),
-	    () -> -m_controller.getRawAxis(2));
+              () -> -m_controller.getRawAxis(1),
+              () -> -m_controller.getRawAxis(2));
     return driveCommand;
   }
 
@@ -130,12 +126,12 @@ public class RobotContainer {
 
     if ( useXboxController )
         armCommand = new ArmControl(
-	    m_arm,
+              m_arm,
             () -> m_xcontroller.getRawButtonPressed(XboxController.Button.kLeftBumper.value),
             () -> m_xcontroller.getRawButtonPressed(XboxController.Button.kRightBumper.value));
     else
         armCommand = new ArmControl(
-	    m_arm,
+              m_arm,
             () -> m_controller.getRawButtonPressed(1),
             () -> m_controller.getRawButtonPressed(2));
     return armCommand;

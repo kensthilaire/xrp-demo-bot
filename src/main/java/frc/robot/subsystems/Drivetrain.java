@@ -4,21 +4,24 @@
 
 package frc.robot.subsystems;
 
-import java.lang.Math;
-
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import frc.robot.sensors.RomiGyro;
+import edu.wpi.first.wpilibj.xrp.XRPGyro;
 import edu.wpi.first.wpilibj.xrp.XRPMotor;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Drivetrain extends Subsystem {
-  private static final double kCountsPerRevolution = 144.0;
-  private static final double kWheelDiameterInch = 2.25; // 70 mm
+public class Drivetrain extends SubsystemBase {
+  private static final double kGearRatio =
+      (30.0 / 14.0) * (28.0 / 16.0) * (36.0 / 9.0) * (26.0 / 8.0); // 48.75:1
+  private static final double kCountsPerMotorShaftRev = 12.0;
+  private static final double kCountsPerRevolution = kCountsPerMotorShaftRev * kGearRatio; // 585.0
+  private static final double kWheelDiameterInch = 2.3622; // 60 mm
 
-  private final XRPMotor m_leftXrpMotor = new XRPMotor(0);
-  private final XRPMotor m_rightXrpMotor = new XRPMotor(1);
+  // The XRP has the left and right motors set to
+  // channels 0 and 1 respectively
+  private final XRPMotor m_leftMotor = new XRPMotor(0);
+  private final XRPMotor m_rightMotor = new XRPMotor(1);
 
   // The XRP has onboard encoders that are hardcoded
   // to use DIO pins 4/5 and 6/7 for the left and right
@@ -26,10 +29,10 @@ public class Drivetrain extends Subsystem {
   private final Encoder m_rightEncoder = new Encoder(6, 7);
 
   // Set up the differential drive controller
-  private final DifferentialDrive m_diffDrive = new DifferentialDrive(m_leftXrpMotor, m_rightXrpMotor);
+  private final DifferentialDrive m_diffDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
-  // Set up the RomiGyro
-  private final RomiGyro m_gyro = new RomiGyro();
+  // Set up the XRPGyro
+  private final XRPGyro m_gyro = new XRPGyro();
 
   // Set up the BuiltInAccelerometer
   private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
@@ -39,8 +42,7 @@ public class Drivetrain extends Subsystem {
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    // m_rightMotor.setInverted(true);
-    m_rightXrpMotor.setInverted(true);
+    m_rightMotor.setInverted(true);
 
     // Use inches as unit for encoder distances
     m_leftEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
@@ -50,7 +52,6 @@ public class Drivetrain extends Subsystem {
 
   public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {
     m_diffDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
-    // m_diffDrivePwm.arcadeDrive(xaxisSpeed, zaxisRotate);
   }
 
   public void resetEncoders() {
@@ -75,16 +76,13 @@ public class Drivetrain extends Subsystem {
   }
 
   public double getAverageDistanceInch() {
-    double leftDistance = Math.abs(getLeftDistanceInch());
-    double rightDistance = Math.abs(getRightDistanceInch());
-    //System.out.println( "Left Encoder Distance: " + leftDistance + ", Right Encoder: " + rightDistance);
-    return (leftDistance + rightDistance) /2.0;
+    return (getLeftDistanceInch() + getRightDistanceInch()) / 2.0;
   }
 
   /**
    * The acceleration in the X-axis.
    *
-   * @return The acceleration of the Romi along the X-axis in Gs
+   * @return The acceleration of the XRP along the X-axis in Gs
    */
   public double getAccelX() {
     return m_accelerometer.getX();
@@ -93,7 +91,7 @@ public class Drivetrain extends Subsystem {
   /**
    * The acceleration in the Y-axis.
    *
-   * @return The acceleration of the Romi along the Y-axis in Gs
+   * @return The acceleration of the XRP along the Y-axis in Gs
    */
   public double getAccelY() {
     return m_accelerometer.getY();
@@ -102,34 +100,34 @@ public class Drivetrain extends Subsystem {
   /**
    * The acceleration in the Z-axis.
    *
-   * @return The acceleration of the Romi along the Z-axis in Gs
+   * @return The acceleration of the XRP along the Z-axis in Gs
    */
   public double getAccelZ() {
     return m_accelerometer.getZ();
   }
 
   /**
-   * Current angle of the Romi around the X-axis.
+   * Current angle of the XRP around the X-axis.
    *
-   * @return The current angle of the Romi in degrees
+   * @return The current angle of the XRP in degrees
    */
   public double getGyroAngleX() {
     return m_gyro.getAngleX();
   }
 
   /**
-   * Current angle of the Romi around the Y-axis.
+   * Current angle of the XRP around the Y-axis.
    *
-   * @return The current angle of the Romi in degrees
+   * @return The current angle of the XRP in degrees
    */
   public double getGyroAngleY() {
     return m_gyro.getAngleY();
   }
 
   /**
-   * Current angle of the Romi around the Z-axis.
+   * Current angle of the XRP around the Z-axis.
    *
-   * @return The current angle of the Romi in degrees
+   * @return The current angle of the XRP in degrees
    */
   public double getGyroAngleZ() {
     return m_gyro.getAngleZ();

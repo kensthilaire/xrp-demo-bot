@@ -51,11 +51,11 @@ public class TurnDegrees extends Command {
   @Override
   public boolean isFinished() {
     /* Need to convert distance travelled to degrees. The Standard
-       Romi Chassis found here, https://www.pololu.com/category/203/romi-chassis-kits,
-       has a wheel placement diameter (149 mm) - width of the wheel (8 mm) = 141 mm
-       or 5.551 inches. We then take into consideration the width of the tires.
+       XRP Chassis found here, https://www.sparkfun.com/products/22230,
+       has a wheel placement diameter (163 mm) - width of the wheel (8 mm) = 155 mm
+       or 6.102 inches. We then take into consideration the width of the tires.
     */
-    double inchPerDegree = Math.PI * 5.551 / 360;
+    double inchPerDegree = Math.PI * 6.102 / 360;
     // Compare distance travelled from start to distance based on degree turn
     return getAverageTurningDistance() >= (inchPerDegree * m_degrees);
   }
